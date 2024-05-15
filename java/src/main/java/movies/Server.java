@@ -47,10 +47,6 @@ public class Server {
 		movies = sortByDescReleaseDate(movies);
 		var query = req.queryParamOrDefault("q", req.queryParams("query"));
 		if (query != null) {
-			// Problem: We are not compiling the pattern and there's a more efficient way of ignoring cases.
-			// Solution:
-			//   var p = Pattern.compile(query, Pattern.CASE_INSENSITIVE);
-			//   movies = movies.filter(m -> p.matcher(m.title).find());
 			movies = movies.filter(m -> Pattern.matches(".*" + query.toUpperCase() + ".*", m.title.toUpperCase()));
 		}
 		return replyJSON(res, movies);
@@ -58,10 +54,6 @@ public class Server {
 
 	private static Stream<Movie> sortByDescReleaseDate(Stream<Movie> movies) {
 		return movies.sorted(Comparator.comparing((Movie m) -> {
-			// Problem: We are parsing a datetime for each item to be sorted.
-			// Example Solution:
-			//   Since date is in isoformat (yyyy-mm-dd) already, that one sorts nicely with normal string sorting
-			//   `return m.releaseDate`
 			try {
 				return LocalDate.parse(m.releaseDate);
 			} catch (Exception e) {
